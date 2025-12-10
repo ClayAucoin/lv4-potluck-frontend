@@ -8,7 +8,8 @@ import GuestListPlain from "./components/GuestListPlain"
 import "./App.css"
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("guest-list")
+  // const [currentPage, setCurrentPage] = useState("guest-list")
+  const [currentPage, setCurrentPage] = useState("meals")
   // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(null)
 

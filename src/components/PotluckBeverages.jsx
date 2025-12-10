@@ -1,75 +1,75 @@
-import { useState, useEffect } from "react";
-import supabase from "../utils/supabase";
-import beveragesImage from "../images/beverages.jpg";
+import { useState, useEffect } from "react"
+import supabase from "../utils/supabase"
+import beveragesImage from "../images/beverages.jpg"
 
 function PotluckBeverages() {
-  const isTesting = false;
+  const isTesting = true
 
-  const [beverages, setBeverages] = useState([]);
-  const [errMsg, setErrMsg] = useState("");
+  const [beverages, setBeverages] = useState([])
+  const [errMsg, setErrMsg] = useState("")
 
   // retrieve data from potluck_beverages
   async function handleFetch() {
     // get data from supabase using rpc function
-    const { data, error } = await supabase.rpc("get_potluck_beverages");
+    const { data, error } = await supabase.rpc("get_potluck_beverages")
 
     // check for error
     if (error) {
-      console.log(error);
-      setErrMsg(error.message);
-      setBeverages([]);
-      return;
+      console.log(error)
+      setErrMsg(error.message)
+      setBeverages([])
+      return
     }
     // update useState with latest data
-    setBeverages(data);
+    setBeverages(data)
   }
 
   // load data on open
   useEffect(() => {
-    handleFetch();
-  }, []);
+    handleFetch()
+  }, [])
 
   // handle form submission
   async function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
 
     // get values from form
-    const bevName = e.target.elements.bevName.value;
-    const guestName = e.target.elements.guestName.value;
-    const serves = e.target.elements.serves.value;
+    const bevName = e.target.elements.bevName.value
+    const guestName = e.target.elements.guestName.value
+    const serves = e.target.elements.serves.value
 
     // create new object
     const newBeverage = {
       beverage_name: bevName,
       guest_name: guestName,
       serves: parseInt(serves),
-    };
+    }
 
     // insert new data into potluck_beverages
     const { error } = await supabase
       .from("potluck_beverages")
-      .insert(newBeverage);
+      .insert(newBeverage)
 
     // retrieve latest data from supabase using rpc function
-    const response = await supabase.rpc("get_potluck_beverages");
-    const data = response.data;
+    const response = await supabase.rpc("get_potluck_beverages")
+    const data = response.data
 
     // if not testing, reset all fields to blank
     if (!isTesting) {
-      e.target.elements.bevName.value = "";
-      e.target.elements.guestName.value = "";
-      e.target.elements.serves.value = "";
+      e.target.elements.bevName.value = ""
+      e.target.elements.guestName.value = ""
+      e.target.elements.serves.value = ""
     }
 
     // check for error
     if (error) {
-      console.log(error);
-      setErrMsg(error.message);
-      setBeverages([]);
-      return;
+      console.log(error)
+      setErrMsg(error.message)
+      setBeverages([])
+      return
     }
     // update useState with latest data
-    setBeverages(data);
+    setBeverages(data)
   }
 
   return (
@@ -169,6 +169,6 @@ function PotluckBeverages() {
         </div>
       </div>
     </>
-  );
+  )
 }
-export default PotluckBeverages;
+export default PotluckBeverages

@@ -1,43 +1,64 @@
-import { useState, useEffect } from "react";
-import supabase from "../utils/supabase";
-import mealsImage from "../images/meals.jpg";
+// src/components/PotluckMeals.jsx
+
+import { useState, useEffect, useCallback } from "react"
+// import supabase from "../utils/supabase"
+import mealsImage from "../images/meals.jpg"
 
 function PotluckMeals() {
-  const isTesting = false;
+  const isTesting = true
 
-  const [meals, setMeals] = useState([]);
-  const [errMsg, setErrMsg] = useState("");
+  const [meals, setMeals] = useState([])
+  // const [errMsg, setErrMsg] = useState("")
+
+  let useUrl = ""
+  if (isTesting) {
+    useUrl = import.meta.env.VITE_DEVELOPMENT_URL
+  } else {
+    useUrl = import.meta.env.VITE_PRODUCTION_URL
+  }
+  const baseUrl = `${useUrl}/meals/`
 
   // retrieve data from potluck_meals
-  async function handleFetch() {
-    // get data from supabase using rpc function
-    const { data, error } = await supabase.rpc("get_potluck_meals");
+  const handleFetch = useCallback(async () => {
+    try {
+      const response = await fetch(baseUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // "x-api-key": apiKey,
+        },
+      })
+      const data = await response.json()
 
-    // check for error
-    if (error) {
-      console.log(error);
-      setErrMsg(error.message);
-      setMeals([]);
-      return;
+      // check for error
+      // if (error) {
+      //   console.log(error)
+      //   setErrMsg(error.message)
+      //   setMeals([])
+      //   return
+      // }
+      // update useState with latest data
+      setMeals(data.data)
+    } catch (err) {
+      console.error("fetch error:", err)
     }
-    // update useState with latest data
-    setMeals(data);
-  }
+  }, [baseUrl])
 
   // load data on open
   useEffect(() => {
-    handleFetch();
-  }, []);
+    handleFetch()
+  }, [handleFetch])
 
   // handle form submission
   async function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
 
     // get values from form
-    const mealName = e.target.elements.mealName.value;
-    const guestName = e.target.elements.guestName.value;
-    const dishType = e.target.elements.dishType.value;
-    const serves = e.target.elements.serves.value;
+    const ete = e.target.elements
+    const mealName = ete.mealName.value
+    const guestName = ete.guestName.value
+    const dishType = ete.dishType.value
+    const serves = ete.serves.value
 
     // create new object
     const newMeal = {
@@ -45,32 +66,39 @@ function PotluckMeals() {
       guest_name: guestName,
       dish_type: dishType.toLowerCase(),
       serves: parseInt(serves),
-    };
+    }
 
     // insert new data into potluck_meals
-    const { error } = await supabase.from("potluck_meals").insert(newMeal);
+    await fetch(baseUrl, {
+      method: "POST",
+      body: JSON.stringify(newMeal),
+      headers: {
+        "Content-Type": "application/json",
+        // "x-api-key": apiKey,
+      },
+    })
 
     // retrieve latest data from supabase using rpc function
-    const response = await supabase.rpc("get_potluck_meals");
-    const data = response.data;
+    handleFetch()
 
     // if not testing, reset all fields to blank
     if (!isTesting) {
-      e.target.elements.mealName.value = "";
-      e.target.elements.guestName.value = "";
-      e.target.elements.dishType.value = "";
-      e.target.elements.serves.value = "";
+      ete.mealName.value = ""
+      ete.guestName.value = ""
+      ete.dishType.value = ""
+      ete.serves.value = ""
     }
 
     // check for error
-    if (error) {
-      console.log(error);
-      setErrMsg(error.message);
-      setMeals([]);
-      return;
-    }
+    // if (error) {
+    //   console.log(error)
+    //   setErrMsg(error.message)
+    //   setMeals([])
+    //   return
+    // }
     // update useState with latest data
-    setMeals(data);
+
+    // setMeals(data)
   }
 
   return (
@@ -160,7 +188,7 @@ function PotluckMeals() {
               </div>
 
               <div className="col-7">
-                {errMsg && <div className="alert alert-danger">{errMsg}</div>}
+                {/* {errMsg && <div className="alert alert-danger">{errMsg}</div>} */}
                 <div className="d-flex nowrap">
                   <h2 className="flex-fill align-self-center text-center">
                     Meals
@@ -191,6 +219,6 @@ function PotluckMeals() {
         </div>
       </div>
     </>
-  );
+  )
 }
-export default PotluckMeals;
+export default PotluckMeals
