@@ -1,0 +1,17 @@
+img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+}
+
+.refresh-button {
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+}
+
+span.name {
+    font-weight: bold;
+    font-size: 1.2em;
+}
