@@ -1,3 +1,5 @@
+// src/components/PotluckBeverages.jsx
+
 import { useState, useEffect, useCallback } from "react"
 import beveragesImage from "../images/beverages.jpg"
 
