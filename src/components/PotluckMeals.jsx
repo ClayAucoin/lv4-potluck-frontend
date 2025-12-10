@@ -1,7 +1,6 @@
 // src/components/PotluckMeals.jsx
 
 import { useState, useEffect, useCallback } from "react"
-// import supabase from "../utils/supabase"
 import mealsImage from "../images/meals.jpg"
 
 function PotluckMeals() {
@@ -38,6 +37,7 @@ function PotluckMeals() {
       //   return
       // }
       // update useState with latest data
+
       setMeals(data.data)
     } catch (err) {
       console.error("fetch error:", err)

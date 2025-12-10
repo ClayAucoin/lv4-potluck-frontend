@@ -1,42 +1,60 @@
-import { useState, useEffect } from "react"
-import supabase from "../utils/supabase"
+import { useState, useEffect, useCallback } from "react"
 import beveragesImage from "../images/beverages.jpg"
 
 function PotluckBeverages() {
   const isTesting = true
 
   const [beverages, setBeverages] = useState([])
-  const [errMsg, setErrMsg] = useState("")
+  // const [errMsg, setErrMsg] = useState("")
 
-  // retrieve data from potluck_beverages
-  async function handleFetch() {
-    // get data from supabase using rpc function
-    const { data, error } = await supabase.rpc("get_potluck_beverages")
-
-    // check for error
-    if (error) {
-      console.log(error)
-      setErrMsg(error.message)
-      setBeverages([])
-      return
-    }
-    // update useState with latest data
-    setBeverages(data)
+  let useUrl = ""
+  if (isTesting) {
+    useUrl = import.meta.env.VITE_DEVELOPMENT_URL
+  } else {
+    useUrl = import.meta.env.VITE_PRODUCTION_URL
   }
+  const baseUrl = `${useUrl}/beverages/`
+
+  const handleFetch = useCallback(async () => {
+    try {
+      const response = await fetch(baseUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // "x-api-key": apiKey,
+        },
+      })
+      const data = await response.json()
+
+      // check for error
+      // if (error) {
+      //   console.log(error)
+      //   setErrMsg(error.message)
+      //   setMeals([])
+      //   return
+      // }
+      // update useState with latest data
+
+      setBeverages(data.data)
+    } catch (err) {
+      console.error("fetch error:", err)
+    }
+  }, [baseUrl])
 
   // load data on open
   useEffect(() => {
     handleFetch()
-  }, [])
+  }, [handleFetch])
 
   // handle form submission
   async function handleSubmit(e) {
     e.preventDefault()
 
     // get values from form
-    const bevName = e.target.elements.bevName.value
-    const guestName = e.target.elements.guestName.value
-    const serves = e.target.elements.serves.value
+    const ete = e.target.elements
+    const bevName = ete.bevName.value
+    const guestName = ete.guestName.value
+    const serves = ete.serves.value
 
     // create new object
     const newBeverage = {
@@ -46,30 +64,36 @@ function PotluckBeverages() {
     }
 
     // insert new data into potluck_beverages
-    const { error } = await supabase
-      .from("potluck_beverages")
-      .insert(newBeverage)
+    // const { error } = await supabase
+    //   .from("potluck_beverages")
+    //   .insert(newBeverage)
+
+    await fetch(baseUrl, {
+      method: "POST",
+      body: JSON.stringify(newBeverage),
+      headers: {
+        "Content-Type": "application/json",
+        // "x-api-key": apiKey,
+      },
+    })
 
     // retrieve latest data from supabase using rpc function
-    const response = await supabase.rpc("get_potluck_beverages")
-    const data = response.data
+    handleFetch()
 
     // if not testing, reset all fields to blank
     if (!isTesting) {
-      e.target.elements.bevName.value = ""
-      e.target.elements.guestName.value = ""
-      e.target.elements.serves.value = ""
+      ete.bevName.value = ""
+      ete.guestName.value = ""
+      ete.serves.value = ""
     }
 
     // check for error
-    if (error) {
-      console.log(error)
-      setErrMsg(error.message)
-      setBeverages([])
-      return
-    }
-    // update useState with latest data
-    setBeverages(data)
+    // if (error) {
+    //   console.log(error)
+    //   setErrMsg(error.message)
+    //   setBeverages([])
+    //   return
+    // }
   }
 
   return (
@@ -138,7 +162,7 @@ function PotluckBeverages() {
               </div>
 
               <div className="col-7">
-                {errMsg && <div className="alert alert-danger">{errMsg}</div>}
+                {/* {errMsg && <div className="alert alert-danger">{errMsg}</div>} */}
                 <div className="d-flex nowrap">
                   <h2 className="flex-fill align-self-center text-center">
                     Beverages
